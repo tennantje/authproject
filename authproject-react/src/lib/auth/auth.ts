@@ -41,7 +41,7 @@ export class NewPasswordRequiredError extends Error {
 }
 
 export async function signUp(email: string, password: string) {
-  const username = email;
+  const username = email; // We use emails for usernames around here!
   try {
     const { user } = await Auth.signUp({
       username,
@@ -54,9 +54,9 @@ export async function signUp(email: string, password: string) {
         enabled: true,
       },
     });
-    console.log("auth.signUp =>", user);
+    return user;
   } catch (error) {
-    console.log("auth.signUp ERROR =>", error);
+    throw error;
   }
 }
 

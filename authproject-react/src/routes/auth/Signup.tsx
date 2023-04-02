@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Link, useLocation, Form, redirect } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, Form, redirect, useActionData } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -9,6 +9,7 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
+import Alert from "@mui/material/Alert";
 import { signUp } from "../../lib/auth/auth";
 
 export async function action({ request }: { request: Request }) {
@@ -16,16 +17,25 @@ export async function action({ request }: { request: Request }) {
   const formObject = Object.fromEntries(formData);
   const email = (formObject.email || "") as string;
   const password = (formObject.password || "") as string;
-  await signUp(email, password);
+  try {
+    await signUp(email, password);
+  } catch (error) {
+    return error;
+  }
   return redirect(`/confirm-signup?email=${encodeURIComponent(email)}`);
 }
 
 export default function SignUp() {
-  const location = useLocation();
+  const [errorMessage, setErrorMessage] = useState("");
+  const error = useActionData();
 
   useEffect(() => {
     document.title = `AuthProject | Signup`;
-  }, [location]);
+    if (error) {
+      const errorObj = error as { message: string };
+      setErrorMessage(errorObj.message);
+    }
+  }, [error]);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -45,6 +55,13 @@ export default function SignUp() {
           Sign up
         </Typography>
         <Box sx={{ mt: 3 }}>
+          {errorMessage ? (
+            <Alert severity="error" sx={{ marginBottom: "20px" }}>
+              {errorMessage}
+            </Alert>
+          ) : (
+            <></>
+          )}
           <Form method="post" id="signup-form">
             <Grid container spacing={2}>
               <Grid item xs={12}>
