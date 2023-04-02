@@ -58,13 +58,13 @@ const useProvideAuth = (): UseAuth => {
 
   const addSessionToContext = async (user: CognitoUser) => {
     const session = user.getSignInUserSession();
-    setUsername(user.getUsername());
-    setJwtToken(session!.getIdToken().getJwtToken());
-    setIsAuthenticated(true);
-    try {
-    } catch (error) {
-      console.log(error);
+    if (!session) {
+      return;
     }
+    setUsername(user.getUsername());
+    setJwtToken(session.getIdToken().getJwtToken());
+    setIsAuthenticated(true);
+    setIsLoading(false);
   };
 
   const signIn = async (username: string, password: string) => {

@@ -11,7 +11,6 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import {
   signIn,
   MFASetupRequiredError,
@@ -43,7 +42,7 @@ export default function SignIn() {
     const password = (data.get("password") as string) || "";
 
     try {
-      const response = await signIn(email, password);
+      await signIn(email, password);
     } catch (error: any) {
       if (error.name === "MFASetupRequiredError") {
         const mfaError = error as MFASetupRequiredError;

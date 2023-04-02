@@ -18,7 +18,6 @@ import ConfirmSignup, {
   action as ConfirmSignupAction,
   loader as ConfirmSignupLoader,
 } from "./routes/auth/ConfirmSignup";
-import SetupMFA from "./routes/auth/SetupMFA";
 import ForgotPassword from "./routes/auth/ForgotPassword";
 import { ProvideAuth } from "./AuthContext";
 

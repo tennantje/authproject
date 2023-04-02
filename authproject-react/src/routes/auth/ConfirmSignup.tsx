@@ -1,27 +1,15 @@
 import React, { useEffect, useState } from "react";
-import {
-  Link,
-  Form,
-  useLocation,
-  useLoaderData,
-  redirect,
-} from "react-router-dom";
+import { Form, useLoaderData, redirect } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-// import Link from "@mui/material/Link";
-import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { confirmSignUp, resendConfirmationCode } from "../../lib/auth/auth";
-import { authErrorMessages } from "@aws-amplify/auth/lib-esm/Errors";
 
 export async function loader({ request }: { request: Request }) {
   const url = new URL(request.url);
@@ -29,13 +17,7 @@ export async function loader({ request }: { request: Request }) {
   return { email };
 }
 
-export async function action({
-  request,
-  params,
-}: {
-  request: Request;
-  params: any;
-}) {
+export async function action({ request }: { request: Request }) {
   const formData = await request.formData();
   const formObject = Object.fromEntries(formData);
   const email = (formObject.email || "") as string;
@@ -82,7 +64,7 @@ export default function ConfirmSignup() {
         </Typography>
         <hr />
         <Alert severity="info">
-          We've sent a unique code to your email address, please provide it
+          We&apos;ve sent a unique code to your email address, please provide it
           below to verify your account.
         </Alert>
 

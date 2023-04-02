@@ -1,18 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { QRCodeSVG } from "qrcode.react";
 import { CognitoUser } from "@aws-amplify/auth";
 import { verifyTOTP } from "../../lib/auth/auth";
@@ -39,7 +36,7 @@ export default function SetupMFA({
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const otp = data.get("otp") as string;
-    const resp = await verifyTOTP(user, otp);
+    await verifyTOTP(user, otp);
     auth.addSessionToContext(user);
     navigate("/");
   };
@@ -68,8 +65,8 @@ export default function SetupMFA({
         <hr />
         <Alert severity="info">
           Multifactor Authentication (or MFA) helps to keep your account safe
-          from malicious actors. When you sign in, you'll need to provide your
-          password as well as a One Time Password (OTP).
+          from malicious actors. When you sign in, you&apos;ll need to provide
+          your password as well as a One Time Password (OTP).
         </Alert>
         <ol>
           <li>

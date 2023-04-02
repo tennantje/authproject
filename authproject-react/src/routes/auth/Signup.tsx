@@ -4,23 +4,19 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { signUp } from "../../lib/auth/auth";
-import { encode } from "querystring";
 
 export async function action({ request }: { request: Request }) {
   const formData = await request.formData();
   const formObject = Object.fromEntries(formData);
   const email = (formObject.email || "") as string;
   const password = (formObject.password || "") as string;
-  const user = await signUp(email, password);
+  await signUp(email, password);
   return redirect(`/confirm-signup?email=${encodeURIComponent(email)}`);
 }
 
@@ -30,15 +26,6 @@ export default function SignUp() {
   useEffect(() => {
     document.title = `AuthProject | Signup`;
   }, [location]);
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
-  };
 
   return (
     <Container component="main" maxWidth="xs">
