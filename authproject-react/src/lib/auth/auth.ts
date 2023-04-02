@@ -107,7 +107,10 @@ export async function handleForcedPasswordReset(
 export async function signIn(username: string, password: string) {
   try {
     const user = await Auth.signIn(username, password);
-    console.log("auth.signIn  =>", user);
+
+    if (user.challengeName) {
+      console.log("Challenge Name => ", user.challengeName);
+    }
 
     if (user.challengeName === "SOFTWARE_TOKEN_MFA") {
       throw new MFACodeRequiredError(user);
@@ -147,8 +150,7 @@ export async function signIn(username: string, password: string) {
       err.name = "UserNotFoundException";
       throw err;
     } else {
-      // An unknown error occured
-      console.log(err);
+      throw err;
     }
   }
 }

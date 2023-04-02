@@ -8,7 +8,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import PasswordIcon from "@mui/icons-material/Password";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import {
@@ -21,6 +21,7 @@ import SetupMFA from "./SetupMFA";
 import { CognitoUser } from "@aws-amplify/auth";
 import ProcessMFA from "./ProcessMFA";
 import NewPasswordRequired from "./NewPasswordRequired";
+import Alert from "@mui/material/Alert";
 
 export default function SignIn() {
   const [user, setUser] = useState<null | CognitoUser>(null);
@@ -28,6 +29,7 @@ export default function SignIn() {
   const [showMFASetupFlow, setShowMFASetupFlow] = useState(false);
   const [showMFACodeRequiredFlow, setShowMFACodeRequiredFlow] = useState(false);
   const [showNewPWDRequiredFlow, setShowNewPWDRequiredFlow] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
 
@@ -59,6 +61,9 @@ export default function SignIn() {
         setShowNewPWDRequiredFlow(true);
       } else if (error.name === "UserNotConfirmedException") {
         navigate(`/confirm-signup?email=${encodeURIComponent(email)}`);
+      } else {
+        const errorObj = error as { message: string };
+        setErrorMessage(errorObj.message);
       }
     }
   };
@@ -86,11 +91,21 @@ export default function SignIn() {
         }}
       >
         <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-          <LockOutlinedIcon />
+          <PasswordIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
+        {errorMessage ? (
+          <Alert
+            severity="error"
+            sx={{ marginTop: "20px", marginBottom: "20px" }}
+          >
+            {errorMessage}
+          </Alert>
+        ) : (
+          <></>
+        )}
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
             margin="normal"
