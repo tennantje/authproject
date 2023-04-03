@@ -157,9 +157,8 @@ export async function signIn(username: string, password: string) {
 
 export async function confirmSignInWithMfa(user: any, code: string) {
   try {
-    const resp = await Auth.confirmSignIn(user, code, "SOFTWARE_TOKEN_MFA"); // SMS_MFA also valid, but not used by this app
-    return resp;
+    return await Auth.confirmSignIn(user, code, "SOFTWARE_TOKEN_MFA"); // SMS_MFA also valid, but not used by this app
   } catch (error) {
-    // Token is not verified
+    throw error;
   }
 }

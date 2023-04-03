@@ -1,11 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import PasswordIcon from "@mui/icons-material/Password";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
@@ -14,6 +14,7 @@ import { confirmSignInWithMfa } from "../../lib/auth/auth";
 import { useAuth } from "../../AuthContext";
 
 export default function ProcessMFA({ user }: { user: CognitoUser | null }) {
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const auth = useAuth();
 
@@ -29,9 +30,14 @@ export default function ProcessMFA({ user }: { user: CognitoUser | null }) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const otp = data.get("otp") as string;
-    const u = await confirmSignInWithMfa(user, otp);
-    auth.addSessionToContext(u);
-    navigate("/");
+    try {
+      const cognitoUser = await confirmSignInWithMfa(user, otp);
+      auth.addSessionToContext(cognitoUser);
+      navigate("/");
+    } catch (error: any) {
+      const errorObj = error as { message: string };
+      setErrorMessage(errorObj.message);
+    }
   };
 
   return (
@@ -46,17 +52,27 @@ export default function ProcessMFA({ user }: { user: CognitoUser | null }) {
         }}
       >
         <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-          <LockOutlinedIcon />
+          <PasswordIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
           One Time Passcode
         </Typography>
-        <hr />
-        <Alert severity="info">
-          A One Time Passcode (OTP) helps to protect you from malicious actors.
-        </Alert>
-
-        <Typography component="h3" variant="body1"></Typography>
+        {errorMessage ? (
+          <Alert
+            severity="error"
+            sx={{ marginTop: "10px", marginBottom: "20px" }}
+          >
+            {errorMessage}
+          </Alert>
+        ) : (
+          <Alert
+            severity="info"
+            sx={{ marginTop: "10px", marginBottom: "20px" }}
+          >
+            A One Time Passcode (OTP) helps to protect you from malicious
+            actors.
+          </Alert>
+        )}
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
             margin="normal"
