@@ -9,29 +9,27 @@ interface UseAuth {
   isAuthenticated: boolean;
   username: string;
   jwtToken: string;
-  signIn: (username: string, password: string) => Promise<Result>;
   signOut: () => void;
   addSessionToContext: (session: CognitoUser) => void;
-}
-
-interface Result {
-  success: boolean;
-  message: string;
 }
 
 type Props = {
   children?: React.ReactNode;
 };
 
-const authContext = createContext({} as UseAuth);
+const authContext = createContext<UseAuth | null>(null);
 
 export const ProvideAuth: React.FC<Props> = ({ children }) => {
   const auth = useProvideAuth();
   return <authContext.Provider value={auth}>{children}</authContext.Provider>;
 };
 
-export const useAuth = () => {
-  return useContext(authContext);
+export const useAuth = (): UseAuth => {
+  const auth = useContext(authContext);
+  if (!auth) {
+    throw new Error("useAuth must be used within a ProvideAuth component");
+  }
+  return auth;
 };
 
 const useProvideAuth = (): UseAuth => {
@@ -41,19 +39,20 @@ const useProvideAuth = (): UseAuth => {
   const [jwtToken, setJwtToken] = useState("");
 
   useEffect(() => {
-    Auth.currentAuthenticatedUser()
-      .then((result) => {
+    const checkAuthenticationStatus = async () => {
+      try {
+        const result = await Auth.currentAuthenticatedUser();
         setUsername(result.username);
         setJwtToken(result.signInUserSession.idToken.jwtToken);
         setIsAuthenticated(true);
-        setIsLoading(false);
-      })
-      .catch(() => {
+      } catch (error) {
         setUsername("");
         setJwtToken("");
         setIsAuthenticated(false);
-        setIsLoading(false);
-      });
+      }
+      setIsLoading(false);
+    };
+    checkAuthenticationStatus();
   }, [isAuthenticated]);
 
   const addSessionToContext = async (user: CognitoUser) => {
@@ -65,21 +64,6 @@ const useProvideAuth = (): UseAuth => {
     setJwtToken(session.getIdToken().getJwtToken());
     setIsAuthenticated(true);
     setIsLoading(false);
-  };
-
-  const signIn = async (username: string, password: string) => {
-    try {
-      const result = await Auth.signIn(username, password);
-      setUsername(result.username);
-      setJwtToken(result.signInUserSession.idToken.jwtToken);
-      setIsAuthenticated(true);
-      return { success: true, message: "" };
-    } catch (error) {
-      return {
-        success: false,
-        message: "LOGIN FAIL",
-      };
-    }
   };
 
   const signOut = async () => {
@@ -96,12 +80,12 @@ const useProvideAuth = (): UseAuth => {
       };
     }
   };
+
   return {
     isLoading,
     isAuthenticated,
     username,
     jwtToken,
-    signIn,
     signOut,
     addSessionToContext,
   };
