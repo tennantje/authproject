@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -22,6 +22,7 @@ export default function SetupMFA({
   user: CognitoUser | null;
   secret: string;
 }) {
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const auth = useAuth();
   useEffect(() => {
@@ -36,9 +37,14 @@ export default function SetupMFA({
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const otp = data.get("otp") as string;
-    await verifyTOTP(user, otp);
-    auth.addSessionToContext(user);
-    navigate("/");
+    try {
+      await verifyTOTP(user, otp);
+      auth.addSessionToContext(user);
+      navigate("/");
+    } catch (error) {
+      const errorObj = error as { message: string };
+      setErrorMessage(errorObj.message);
+    }
   };
 
   const formattedCode = `otpauth://totp/AWSCognito:${encodeURIComponent(
@@ -62,12 +68,24 @@ export default function SetupMFA({
         <Typography component="h1" variant="h5">
           AuthProject requires MFA
         </Typography>
-        <hr />
-        <Alert severity="info">
-          Multifactor Authentication (or MFA) helps to keep your account safe
-          from malicious actors. When you sign in, you&apos;ll need to provide
-          your password as well as a One Time Password (OTP).
-        </Alert>
+        {errorMessage ? (
+          <Alert
+            severity="error"
+            sx={{ marginTop: "10px", marginBottom: "20px" }}
+          >
+            {errorMessage}
+          </Alert>
+        ) : (
+          <Alert
+            severity="info"
+            sx={{ marginTop: "10px", marginBottom: "20px" }}
+          >
+            Multifactor Authentication (or MFA) helps to keep your account safe
+            from malicious actors. When you sign in, you&apos;ll need to provide
+            your password as well as a One Time Password (OTP).
+          </Alert>
+        )}
+
         <ol>
           <li>
             Install an application like <a href="https://authy.com">Authy</a> or{" "}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, useLoaderData, useActionData, redirect } from "react-router-dom";
+import { useLoaderData, useActionData, Form, redirect } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -9,7 +9,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
-import { confirmSignUp, resendConfirmationCode } from "../../lib/auth/auth";
+import { setNewForgottenPassword } from "../../lib/auth/auth";
 
 export async function loader({ request }: { request: Request }) {
   const url = new URL(request.url);
@@ -21,39 +21,38 @@ export async function action({ request }: { request: Request }) {
   const formData = await request.formData();
   const formObject = Object.fromEntries(formData);
   const email = (formObject.email || "") as string;
-  const token = (formObject.token || "") as string;
+  const code = (formObject.code || "") as string;
+  const newPassword = (formObject.newPassword || "") as string;
+  const confirmNewPassword = (formObject.confirmNewPassword || "") as string;
+
+  if (newPassword !== confirmNewPassword) {
+    return "Passwords do not match";
+  }
+
   try {
-    await confirmSignUp(email, token);
+    await setNewForgottenPassword(email, code, newPassword);
     return redirect("/signin");
-  } catch (error) {
-    return error;
+  } catch (error: any) {
+    const errorObj = error as { message: string };
+    return errorObj.message;
   }
 }
 
-export default function ConfirmSignup() {
-  const [errorMessage, setErrorMessage] = useState("");
-  const [disableCodeSend, setDisableCodeSend] = useState(false);
-  const error = useActionData();
+export default function ForgotPasswordConfirmation() {
+  const error = useActionData() as string;
   const { email } = useLoaderData() as any;
+  const [passwordError, setPasswordError] = useState("");
 
   useEffect(() => {
-    document.title = `AuthProject | Email Confirmation`;
+    document.title = `AuthProject | Reset Password`;
+
     const input = document.getElementById("email") as HTMLInputElement;
     input.value = email;
+
     if (error) {
-      const errorObj = error as { message: string };
-      setErrorMessage(errorObj.message);
+      setPasswordError(error);
     }
   }, [email, error]);
-
-  const handleResendMyCode = async () => {
-    setDisableCodeSend(true);
-    try {
-      await resendConfirmationCode(email);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -70,11 +69,16 @@ export default function ConfirmSignup() {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Email Confirmation
+          Password Reset Required
         </Typography>
-        {errorMessage ? (
-          <Alert severity="error" sx={{ marginBottom: "20px" }}>
-            {errorMessage}
+
+        {passwordError ? (
+          <Alert
+            severity="error"
+            sx={{ marginTop: "10px", marginBottom: "20px" }}
+          >
+            {" "}
+            {passwordError}
           </Alert>
         ) : (
           <Alert
@@ -88,7 +92,7 @@ export default function ConfirmSignup() {
 
         <Typography component="h3" variant="body1"></Typography>
         <Box sx={{ mt: 1 }}>
-          <Form method="post" id="confirm-signup-form">
+          <Form method="post" id="confirm-reset-form">
             <TextField
               margin="normal"
               required
@@ -102,10 +106,27 @@ export default function ConfirmSignup() {
               margin="normal"
               required
               fullWidth
-              id="token"
-              label="Confirmation Code"
-              name="token"
-              autoFocus
+              id="code"
+              label="Password Reset Code (Check Email)"
+              name="code"
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="newPassword"
+              type="password"
+              label="New Password"
+              name="newPassword"
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="confirmNewPassword"
+              type="password"
+              label="Confirm New Password"
+              name="confirmNewPassword"
             />
             <Button
               type="submit"
@@ -113,22 +134,9 @@ export default function ConfirmSignup() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Confirm my account
+              RESET PASSWORD
             </Button>
           </Form>
-        </Box>
-        <Box sx={{ mt: 1 }}>
-          <Button
-            onClick={handleResendMyCode}
-            type="submit"
-            disabled={disableCodeSend}
-            fullWidth
-            variant="contained"
-            color="secondary"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            {disableCodeSend ? "CODE WAS SENT" : "SEND MY CODE AGAIN"}
-          </Button>
         </Box>
       </Box>
     </Container>

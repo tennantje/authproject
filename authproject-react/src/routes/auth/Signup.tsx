@@ -19,10 +19,10 @@ export async function action({ request }: { request: Request }) {
   const password = (formObject.password || "") as string;
   try {
     await signUp(email, password);
+    return redirect(`/confirm-signup?email=${encodeURIComponent(email)}`);
   } catch (error) {
     return error;
   }
-  return redirect(`/confirm-signup?email=${encodeURIComponent(email)}`);
 }
 
 export default function SignUp() {

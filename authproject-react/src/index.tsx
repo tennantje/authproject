@@ -20,6 +20,10 @@ import ConfirmSignup, {
 } from "./routes/auth/ConfirmSignup";
 import ForgotPassword from "./routes/auth/ForgotPassword";
 import { ProvideAuth } from "./AuthContext";
+import ForgotPasswordConfirmation, {
+  action as ForgotPasswordConfirmationAction,
+  loader as ForgotPasswordConfirmationLoader,
+} from "./routes/auth/ForgotPasswordConfirmation";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -53,6 +57,12 @@ const router = createBrowserRouter([
           {
             path: "forgot-password",
             element: <ForgotPassword />,
+          },
+          {
+            path: "forgot-password-confirmation",
+            element: <ForgotPasswordConfirmation />,
+            action: ForgotPasswordConfirmationAction,
+            loader: ForgotPasswordConfirmationLoader,
           },
         ],
       },

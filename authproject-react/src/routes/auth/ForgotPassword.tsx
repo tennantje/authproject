@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -9,21 +9,32 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
+import { startForgetPasswordFlow } from "../../lib/auth/auth";
+import Alert from "@mui/material/Alert";
+import ForgotPasswordReset from "./ForgotPasswordConfirmation";
 
 export default function ForgotPassword() {
-  const location = useLocation();
+  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.title = `AuthProject | Forgot Password`;
-  }, [location]);
+  }, []);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+    const email = (data.get("email") as string) || "";
+    try {
+      await startForgetPasswordFlow(email);
+      navigate(
+        `/forgot-password-confirmation?email=${encodeURIComponent(email)}`
+      );
+    } catch (error) {
+      console.log(error);
+      const errorObj = error as { message: string };
+      setErrorMessage(errorObj.message.replaceAll("Username", "Email"));
+    }
   };
 
   return (
@@ -43,6 +54,22 @@ export default function ForgotPassword() {
         <Typography component="h1" variant="h5">
           Reset Password
         </Typography>
+        {errorMessage ? (
+          <Alert
+            severity="error"
+            sx={{ marginTop: "10px", marginBottom: "20px" }}
+          >
+            {errorMessage}
+          </Alert>
+        ) : (
+          <Alert
+            severity="info"
+            sx={{ marginTop: "10px", marginBottom: "20px" }}
+          >
+            If you&apos;ve fogotten your password, please complete the form
+            below and we&apos;ll email you a temporary password.
+          </Alert>
+        )}
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
             margin="normal"

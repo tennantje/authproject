@@ -62,33 +62,26 @@ export async function signUp(email: string, password: string) {
 
 export async function resendConfirmationCode(username: string) {
   try {
-    const resp = await Auth.resendSignUp(username);
-    console.log("auth.resendConfirmationCode =>", resp);
-  } catch (err) {
-    console.log("auth.resendConfirmationCode ERROR =>", err);
+    return await Auth.resendSignUp(username);
+  } catch (error) {
+    throw error;
   }
 }
 
 export async function confirmSignUp(username: string, code: string) {
   try {
-    const resp = await Auth.confirmSignUp(username, code);
-    console.log("auth.confirmSignUp =>", resp);
+    return await Auth.confirmSignUp(username, code);
   } catch (error) {
-    console.log("auth.confirmSignUp ERROR =>", error);
+    throw error;
   }
 }
 
 export async function verifyTOTP(user: any, secret: string) {
   try {
-    const verifyTOTPResp = await Auth.verifyTotpToken(user, secret);
-    const setPreferredMFARespawait = await Auth.setPreferredMFA(user, "TOTP");
-    console.log("auth.verifyTOTP.verifyTOTPResp =>", verifyTOTPResp);
-    console.log(
-      "auth.verifyTOTP.setPreferredMFARespawait =>",
-      setPreferredMFARespawait
-    );
+    await Auth.verifyTotpToken(user, secret);
+    await Auth.setPreferredMFA(user, "TOTP");
   } catch (error) {
-    console.log("auth.verifyTOTP ERROR =>", error);
+    throw error;
   }
 }
 
@@ -97,8 +90,7 @@ export async function handleForcedPasswordReset(
   newPassword: string
 ) {
   try {
-    const loggedUser = await Auth.completeNewPassword(user, newPassword);
-    console.log("auth.handleForcedPasswordReset.loggedUser => ", loggedUser);
+    return await Auth.completeNewPassword(user, newPassword);
   } catch (error) {
     throw error;
   }
@@ -107,10 +99,6 @@ export async function handleForcedPasswordReset(
 export async function signIn(username: string, password: string) {
   try {
     const user = await Auth.signIn(username, password);
-
-    if (user.challengeName) {
-      console.log("Challenge Name => ", user.challengeName);
-    }
 
     if (user.challengeName === "SOFTWARE_TOKEN_MFA") {
       throw new MFACodeRequiredError(user);
@@ -158,6 +146,26 @@ export async function signIn(username: string, password: string) {
 export async function confirmSignInWithMfa(user: any, code: string) {
   try {
     return await Auth.confirmSignIn(user, code, "SOFTWARE_TOKEN_MFA"); // SMS_MFA also valid, but not used by this app
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function startForgetPasswordFlow(email: string) {
+  try {
+    return await Auth.forgotPassword(email);
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function setNewForgottenPassword(
+  email: string,
+  code: string,
+  newPassword: string
+) {
+  try {
+    return await Auth.forgotPasswordSubmit(email, code, newPassword);
   } catch (error) {
     throw error;
   }

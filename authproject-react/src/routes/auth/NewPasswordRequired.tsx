@@ -41,10 +41,10 @@ export default function NewPasswordRequired({
     }
     try {
       await handleForcedPasswordReset(user, newPassword);
+      navigate("/");
     } catch (error: any) {
       setPasswordError(error.message);
     }
-    navigate("/");
   };
 
   return (
@@ -97,7 +97,6 @@ export default function NewPasswordRequired({
             type="password"
             label="Confirm New Password"
             name="confirmNewPassword"
-            autoFocus
           />
           <Button
             type="submit"
