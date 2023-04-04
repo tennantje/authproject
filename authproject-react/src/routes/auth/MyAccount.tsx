@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 
@@ -7,7 +7,7 @@ export default function Home() {
   const location = useLocation();
 
   useEffect(() => {
-    document.title = `AuthProject | Home`;
+    document.title = `AuthProject | My Account`;
   }, [location]);
 
   return (
@@ -24,7 +24,7 @@ export default function Home() {
         color="text.primary"
         gutterBottom
       >
-        AuthProject
+        My Account
       </Typography>
       <Typography
         variant="h5"
@@ -32,7 +32,7 @@ export default function Home() {
         color="text.secondary"
         component="p"
       >
-        A demo that adds Amazon Cognito to React.
+        A placeholder for "My Account"
       </Typography>
     </Container>
   );

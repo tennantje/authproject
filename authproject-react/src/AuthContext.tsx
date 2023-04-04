@@ -54,7 +54,7 @@ const useProvideAuth = (): UseAuth => {
         setIsAuthenticated(false);
         setIsLoading(false);
       });
-  }, []);
+  }, [isAuthenticated]);
 
   const addSessionToContext = async (user: CognitoUser) => {
     const session = user.getSignInUserSession();

@@ -1,7 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { ThemeProvider } from "@mui/material/styles";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  RouteObject,
+} from "react-router-dom";
 
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -24,10 +28,50 @@ import ForgotPasswordConfirmation, {
   action as ForgotPasswordConfirmationAction,
   loader as ForgotPasswordConfirmationLoader,
 } from "./routes/auth/ForgotPasswordConfirmation";
+import PrivateRoutes from "./PrivateRoutes";
+import MyAccount from "./routes/auth/MyAccount";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
+const userManagementRoutes: RouteObject[] = [
+  {
+    path: "signin",
+    element: <Signin />,
+  },
+  {
+    path: "signup",
+    element: <Signup />,
+    action: SignupAction,
+  },
+  {
+    path: "confirm-signup",
+    element: <ConfirmSignup />,
+    action: ConfirmSignupAction,
+    loader: ConfirmSignupLoader,
+  },
+  {
+    path: "forgot-password",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "forgot-password-confirmation",
+    element: <ForgotPasswordConfirmation />,
+    action: ForgotPasswordConfirmationAction,
+    loader: ForgotPasswordConfirmationLoader,
+  },
+];
+const privateRoutes: RouteObject[] = [
+  {
+    element: <PrivateRoutes />,
+    children: [
+      {
+        path: "myaccount",
+        element: <MyAccount />,
+      },
+    ],
+  },
+];
 
 const router = createBrowserRouter([
   {
@@ -39,31 +83,8 @@ const router = createBrowserRouter([
         errorElement: <ErrorPage />,
         children: [
           { index: true, element: <Home /> },
-          {
-            path: "signin",
-            element: <Signin />,
-          },
-          {
-            path: "signup",
-            element: <Signup />,
-            action: SignupAction,
-          },
-          {
-            path: "confirm-signup",
-            element: <ConfirmSignup />,
-            action: ConfirmSignupAction,
-            loader: ConfirmSignupLoader,
-          },
-          {
-            path: "forgot-password",
-            element: <ForgotPassword />,
-          },
-          {
-            path: "forgot-password-confirmation",
-            element: <ForgotPasswordConfirmation />,
-            action: ForgotPasswordConfirmationAction,
-            loader: ForgotPasswordConfirmationLoader,
-          },
+          ...userManagementRoutes,
+          ...privateRoutes,
         ],
       },
     ],

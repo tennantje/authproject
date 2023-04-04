@@ -83,12 +83,14 @@ function SignedInContent({ username }: { username: string }) {
           onClose={handleCloseUserMenu}
         >
           <MenuItem onClick={handleCloseUserMenu}>
-            <Typography textAlign="center">My Account</Typography>
+            <Link component={RouterLink} to="/myaccount" underline="none">
+              My Account
+            </Link>
           </MenuItem>
           <MenuItem onClick={handleCloseUserMenu}>
-            <Typography onClick={handleSignout} textAlign="center">
+            <Link onClick={handleSignout} textAlign="center" underline="none">
               Signout
-            </Typography>
+            </Link>
           </MenuItem>
         </Menu>
       </Box>
